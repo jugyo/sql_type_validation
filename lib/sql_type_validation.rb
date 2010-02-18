@@ -1,5 +1,3 @@
-require 'validation_reflection'
-
 module SqlTypeValidation
   def self.included(base)
     base.send(:extend, ClassMethods)
@@ -25,47 +23,33 @@ module SqlTypeValidation
     def define_sql_type_validation(column)
       return if column.primary
 
-      validations_to_define = []
-
       case column.type
       when :string, :text
         unless column.null
-          validations_to_define << {:method => :validates_presence_of, :options => [column.name]}
+          validates_presence_of column.name
         end
-        validations_to_define << {
-          :method => :validates_length_of,
-          :options => [column.name, {:maximum => column.limit, :allow_nil => column.null}]
-        }
+        validates_length_of column.name, :maximum => column.limit, :allow_nil => column.null
       when :integer
         association = reflect_on_all_associations.detect { |i|
           i.association_foreign_key == column.name
         }
         if association
           unless column.null
-            validations_to_define << {:method => :validates_presence_of, :options => [association.name]}
+            validates_presence_of association.name
           end
         else
           unless column.null
-            validations_to_define << {:method => :validates_presence_of, :options => [column.name]}
+            validates_presence_of column.name
           end
           if column.limit
-            validations_to_define << {
-              :method => :validates_numericality_of,
-              :options => [column.name, {:less_than => 10**column.limit, :allow_nil => column.null}]
-            }
+            validates_numericality_of column.name,
+              :less_than => 10**column.limit,
+              :allow_nil => column.null
           end
         end
       when :boolean
         unless column.null
-          validations_to_define << {
-            :method => :validates_inclusion_of, :options => [column.name, {:in => [true, false]}]
-          }
-        end
-      end
-
-      validations_to_define.each do |validation|
-        unless reflect_on_validations_for(column.name).any? { |v| v.macro == validation[:method] }
-          self.send(validation[:method], *validation[:options])
+          validates_inclusion_of column.name, :in => [true, false]
         end
       end
     end

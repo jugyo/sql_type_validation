@@ -17,10 +17,7 @@ end
 
 class SqlTypeValidationTest < ActiveSupport::TestCase
   test 'for Category#name' do
-    refl = Category.reflect_on_validations_for(:name).detect do |i|
-      i.macro == :validates_presence_of
-    end
-
+    refl = Category.reflect_on_validations_for(:name)[0]
     assert_not_nil refl
   end
 
@@ -29,13 +26,9 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
     assert !refl.map(&:macro).include?(:validates_presence_of)
   end
 
-  test 'for foo : validation が二重に定義されないこと' do
-    refl = Entry.reflect_on_validations_for(:foo).detect do |i|
-      i.macro == :validates_length_of
-    end
-
-    assert_not_nil refl
-    assert_equal({:maximum=>5}, refl.options)
+  test 'for foo : validation が二重に定義されること' do
+    refl = Entry.reflect_on_validations_for(:foo)
+    assert_equal 2, refl.size
   end
 
   test 'for allow_null_string' do
@@ -44,19 +37,13 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   end
 
   test 'for not_null_string' do
-    refl = Entry.reflect_on_validations_for(:not_null_string).detect do |i|
-      i.macro == :validates_presence_of
-    end
-
+    refl = Entry.reflect_on_validations_for(:not_null_string)[0]
     assert_not_nil refl
     assert_equal({}, refl.options)
   end
 
   test 'for limit_10_string' do
-    refl = Entry.reflect_on_validations_for(:limit_10_string).detect do |i|
-      i.macro == :validates_length_of
-    end
-
+    refl = Entry.reflect_on_validations_for(:limit_10_string)[0]
     assert_not_nil refl
     assert_equal({:allow_nil=>true, :maximum=>10}, refl.options)
   end
@@ -68,6 +55,12 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
 
     assert_not_nil refl
     assert_equal({:allow_nil=>false, :maximum=>10}, refl.options)
+
+    refl = Entry.reflect_on_validations_for(:not_null_limit_10_string).detect do |i|
+      i.macro == :validates_presence_of
+    end
+
+    assert_not_nil refl
   end
 
   test 'for allow_null_integer' do
@@ -76,19 +69,13 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   end
 
   test 'for not_null_integer' do
-    refl = Entry.reflect_on_validations_for(:not_null_integer).detect do |i|
-      i.macro == :validates_presence_of
-    end
-
+    refl = Entry.reflect_on_validations_for(:not_null_integer)[0]
     assert_not_nil refl
     assert_equal({}, refl.options)
   end
 
   test 'for limit_10_integer' do
-    refl = Entry.reflect_on_validations_for(:limit_10_integer).detect do |i|
-      i.macro == :validates_numericality_of
-    end
-
+    refl = Entry.reflect_on_validations_for(:limit_10_integer)[0]
     assert_not_nil refl
     assert_equal({:allow_nil=>true, :less_than=>10000000000}, refl.options)
   end
@@ -109,10 +96,7 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   end
 
   test 'for association for blog' do
-    refl = Entry.reflect_on_validations_for(:blog).detect do |i|
-      i.macro == :validates_presence_of
-    end
-
+    refl = Entry.reflect_on_validations_for(:blog)[0]
     assert_not_nil refl
     assert_equal({}, refl.options)
   end
@@ -128,19 +112,13 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   end
 
   test 'for not_null_boolean' do
-    refl = Entry.reflect_on_validations_for(:not_null_boolean).detect do |i|
-      i.macro == :validates_inclusion_of
-    end
-
+    refl = Entry.reflect_on_validations_for(:not_null_boolean)[0]
     assert_not_nil refl
     assert_equal({:in=>[true, false]}, refl.options)
   end
 
   test 'for limit_100_text' do
-    refl = Entry.reflect_on_validations_for(:limit_100_text).detect do |i|
-      i.macro == :validates_length_of
-    end
-
+    refl = Entry.reflect_on_validations_for(:limit_100_text)[0]
     assert_not_nil refl
     assert_equal({:allow_nil=>true, :maximum=>100}, refl.options)
   end
