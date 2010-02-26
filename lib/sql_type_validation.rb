@@ -20,6 +20,14 @@ module SqlTypeValidation
       end
     end
 
+    def tokenizer
+      if defined? TOKENIZER
+        TOKENIZER
+      else
+        lambda {|str| str.bytes.to_a }
+      end
+    end
+
     def define_sql_type_validation(column)
       return if column.primary
 
@@ -31,7 +39,7 @@ module SqlTypeValidation
         validates_length_of column.name,
           :maximum   => column.limit,
           :allow_nil => column.null,
-          :tokenizer => lambda {|str| str.bytes.to_a }
+          :tokenizer => tokenizer
       when :integer
         association = reflect_on_all_associations.detect { |i|
           i.association_foreign_key == column.name
