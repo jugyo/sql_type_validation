@@ -28,7 +28,10 @@ module SqlTypeValidation
         unless column.null
           validates_presence_of column.name
         end
-        validates_length_of column.name, :maximum => column.limit, :allow_nil => column.null
+        validates_length_of column.name,
+          :maximum   => column.limit,
+          :allow_nil => column.null,
+          :tokenizer => lambda {|str| str.bytes.to_a }
       when :integer
         association = reflect_on_all_associations.detect { |i|
           i.association_foreign_key == column.name
