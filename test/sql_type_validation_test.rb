@@ -1,6 +1,8 @@
 require 'test_helper'
 require 'validation_reflection'
 
+SqlTypeValidation::TOKENIZER = lambda {|s| s.bytes.to_a}
+
 class Blog < ActiveRecord::Base
 end
 
@@ -45,7 +47,7 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   test 'for limit_10_string' do
     refl = Entry.reflect_on_validations_for(:limit_10_string)[0]
     assert_not_nil refl
-    assert_equal({:allow_nil=>true, :maximum=>10}, refl.options)
+    assert_equal({:allow_nil=>true, :maximum=>10, :tokenizer => SqlTypeValidation::TOKENIZER}, refl.options)
   end
 
   test 'for not_null_limit_10_string' do
@@ -54,7 +56,7 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
     end
 
     assert_not_nil refl
-    assert_equal({:allow_nil=>false, :maximum=>10}, refl.options)
+    assert_equal({:allow_nil=>false, :maximum=>10, :tokenizer => SqlTypeValidation::TOKENIZER}, refl.options)
 
     refl = Entry.reflect_on_validations_for(:not_null_limit_10_string).detect do |i|
       i.macro == :validates_presence_of
@@ -120,6 +122,6 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   test 'for limit_100_text' do
     refl = Entry.reflect_on_validations_for(:limit_100_text)[0]
     assert_not_nil refl
-    assert_equal({:allow_nil=>true, :maximum=>100}, refl.options)
+    assert_equal({:allow_nil=>true, :maximum=>100, :tokenizer => SqlTypeValidation::TOKENIZER}, refl.options)
   end
 end
