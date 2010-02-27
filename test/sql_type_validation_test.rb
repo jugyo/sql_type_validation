@@ -100,6 +100,7 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   test 'for association for blog' do
     refl = Entry.reflect_on_validations_for(:blog)[0]
     assert_not_nil refl
+    assert_equal :validates_associated, refl.macro
     assert_equal({}, refl.options)
   end
 
