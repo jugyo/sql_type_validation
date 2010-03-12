@@ -55,7 +55,7 @@ module SqlTypeValidation
           if column.limit
             validates_numericality_of column.name,
               :less_than => 10**column.limit,
-              :allow_nil => column.null
+              :allow_blank => true
           end
         end
       when :boolean
