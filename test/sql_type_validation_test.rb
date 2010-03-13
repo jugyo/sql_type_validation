@@ -79,7 +79,7 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   test 'for limit_10_integer' do
     refl = Entry.reflect_on_validations_for(:limit_10_integer)[0]
     assert_not_nil refl
-    assert_equal({:allow_nil=>true, :less_than=>10000000000}, refl.options)
+    assert_equal({:allow_blank=>true, :less_than=>10000000000}, refl.options)
   end
 
   test 'for not_null_limit_10_integer' do
@@ -88,7 +88,7 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
     end
 
     assert_not_nil refl
-    assert_equal({:allow_nil=>false, :less_than=>10000000000}, refl.options)
+    assert_equal({:allow_blank=>true, :less_than=>10000000000}, refl.options)
 
     refl = Entry.reflect_on_validations_for(:not_null_limit_10_integer).detect do |i|
       i.macro == :validates_presence_of
@@ -100,7 +100,7 @@ class SqlTypeValidationTest < ActiveSupport::TestCase
   test 'for association for blog' do
     refl = Entry.reflect_on_validations_for(:blog)[0]
     assert_not_nil refl
-    assert_equal :validates_associated, refl.macro
+    assert_equal :validates_presence_of, refl.macro
     assert_equal({}, refl.options)
   end
 

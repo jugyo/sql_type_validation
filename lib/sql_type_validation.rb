@@ -46,7 +46,7 @@ module SqlTypeValidation
         }
         if association
           unless column.null
-            validates_associated association.name
+            validates_presence_of association.name
           end
         else
           unless column.null
