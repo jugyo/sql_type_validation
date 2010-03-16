@@ -38,7 +38,7 @@ module SqlTypeValidation
         end
         validates_length_of column.name,
           :maximum   => column.limit,
-          :allow_nil => column.null,
+          :allow_blank => true,
           :tokenizer => tokenizer
       when :integer
         association = reflect_on_all_associations.detect { |i|
